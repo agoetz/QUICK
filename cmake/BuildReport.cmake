@@ -16,10 +16,14 @@ function(print_build_report)
 	colormsg("")
 	colormsg(HIRED "Fortran" HIWHITE "No-Opt:   " WHITE "${CMAKE_Fortran_FLAGS}" HIBLUE "${NO_OPT_FFLAGS_SPC}")
 	colormsg(HIRED "Fortran" HIWHITE "Optimized:" WHITE "${CMAKE_Fortran_FLAGS}" HIBLUE "${OPT_FFLAGS_SPC}")
+	colormsg("")
+        if(DEFINED CUDA)
+	    colormsg(GREEN "nvcc" HIWHITE "flags:" WHITE "${CUDA_NVCC_FLAGS}")
+        endif()
 	
 	colormsg("")
-    colormsg("                         " _HIMAG_ "3rd Party Libraries")
-	       colormsg("---building bundled: -----------------------------------------------------")
+	colormsg("                         " _HIMAG_ "3rd Party Libraries")
+	colormsg("---building bundled: -----------------------------------------------------")
 	
 	foreach(TOOL ${NEEDED_3RDPARTY_TOOLS})
 	
