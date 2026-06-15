@@ -53,7 +53,6 @@
     use quick_ecp_module
     use quick_divcon_module
     use quick_electrondensity_module
-    use quick_MPI_module
     use quick_timer_module
     implicit none
     end module allmod

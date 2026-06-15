@@ -196,7 +196,7 @@ extern "C" void gpu_set_device_(int* gpu_dev_id, int* ierr)
 //-----------------------------------------------
 extern "C" void gpu_new_(
 #if defined(MPIV_GPU)
-        int mpirank,
+        int quick_comm_rank,
 #endif
         int* ierr)
 {
@@ -204,7 +204,7 @@ extern "C" void gpu_new_(
 #if defined(MPIV_GPU)
     char fname[16];
 
-    sprintf(fname, "debug.gpu.%i", mpirank);
+    sprintf(fname, "debug.gpu.%i", quick_comm_rank);
     debugFile = fopen(fname, "w+");
 #else
     debugFile = fopen("debug.gpu", "w+");
@@ -231,8 +231,8 @@ extern "C" void gpu_new_(
 #if defined(MPIV_GPU)
     gpu->mpi_comm = MPI_COMM_NULL;
 #endif
-    gpu->mpirank = -1;
-    gpu->mpisize = 0;    
+    gpu->quick_comm_rank = -1;
+    gpu->quick_comm_size = 0;    
     gpu->timer = NULL;
     gpu->natom = 0;
     gpu->nextatom = 0;
@@ -545,7 +545,7 @@ extern "C" void gpu_setup_(int* natom, int* nbasis, int* nElec, int* imult, int*
 #if defined(DEBUG)
     PRINTDEBUG("BEGIN TO SETUP");
   #if defined(MPIV_GPU)
-    fprintf(gpu->debugFile,"mpirank %i natoms %i \n", gpu->mpirank, *natom );
+    fprintf(gpu->debugFile,"quick_comm_rank %i natoms %i \n", gpu->quick_comm_rank, *natom );
   #endif
 #endif
 
@@ -2340,7 +2340,7 @@ void prune_grid_sswgrad()
 #if defined(MPIV_GPU)
     GPU_TIMER_START();
 
-    int netgain = getAdjustment(gpu->mpi_comm, gpu->mpisize, gpu->mpirank, count);
+    int netgain = getAdjustment(gpu->mpi_comm, gpu->quick_comm_size, gpu->quick_comm_rank, count);
     count += netgain;
 
     GPU_TIMER_STOP();
@@ -2360,7 +2360,7 @@ void prune_grid_sswgrad()
 
     GPU_TIMER_START();
 
-    sswderRedistribute(gpu->mpi_comm, gpu->mpisize, gpu->mpirank, count-netgain, count,
+    sswderRedistribute(gpu->mpi_comm, gpu->quick_comm_size, gpu->quick_comm_rank, count-netgain, count,
             tmp_gridx, tmp_gridy, tmp_gridz, tmp_exc, tmp_quadwt, tmp_gatm, gpu->gpu_xcq->gridx_ssd->_hostData,
             gpu->gpu_xcq->gridy_ssd->_hostData, gpu->gpu_xcq->gridz_ssd->_hostData,
             gpu->gpu_xcq->exc_ssd->_hostData, gpu->gpu_xcq->quadwt->_hostData,
@@ -2627,8 +2627,8 @@ extern "C" void gpu_upload_dft_grid_(QUICKDouble *gridxb, QUICKDouble *gridyb, Q
     gpu->timer->t_xclb += (double) time / 1000.0;
     GPU_TIMER_DESTROY();
 
-    gpu->gpu_sim.mpirank = gpu->mpirank;
-    gpu->gpu_sim.mpisize = gpu->mpisize;
+    gpu->gpu_sim.quick_comm_rank = gpu->quick_comm_rank;
+    gpu->gpu_sim.quick_comm_size = gpu->quick_comm_size;
 #endif
 
     gpu->xc_threadsPerBlock = SM_2X_XC_THREADS_PER_BLOCK;

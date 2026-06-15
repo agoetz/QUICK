@@ -12,16 +12,14 @@
 
 ! Program for testing QUICK library API
   program test_quick_api
-    use test_quick_api_module, only : loadTestData, printQuickOutput
-    use quick_api_module, only : setQuickJob, getQuickEnergy, getQuickEnergyGradients, deleteQuickJob 
+    use test_quick_api_module, only: loadTestData, printQuickOutput
+    use quick_api_module, only: setQuickJob, getQuickEnergy, getQuickEnergyGradients, deleteQuickJob 
     use quick_exception_module
-#ifdef MPIV
-    use test_quick_api_module, only : mpi_initialize, printQuickMPIOutput, mpi_exit
-    use quick_api_module, only : setQuickMPI
-#endif
-#ifdef MPIV
-    use mpi
+#if defined(MPIV)
+    use test_quick_api_module, only: mpi_initialize, printQuickMPIOutput, mpi_exit
+    use quick_api_module, only: setQuickMPI
     use quick_mpi_module, only: quick_comm
+    use mpi
     ! use qmmm_module, only: qmmm_nml, qmmm_mpi
 #endif
 
@@ -56,26 +54,26 @@
 
 #ifdef MPIV
     ! essential mpi information 
-    integer :: mpierror = 0
-    integer :: mpirank  = 0
-    integer :: mpisize  = 1
+    integer :: quick_mpi_error = 0
+    integer :: quick_comm_rank  = 0
+    integer :: quick_comm_size  = 1
     logical :: master   = .true.
 #endif
 
     ierr = 0
 
 #ifdef MPIV
-    ! initialize mpi library and get mpirank, mpisize
-    call mpi_initialize(mpisize, mpirank, master, mpierror)
+    ! initialize mpi library and get quick_comm_rank, quick_comm_size
+    call mpi_initialize(MPI_COMM_WORLD, quick_comm_size, quick_comm_rank, master, quick_mpi_error)
 
     ! setup quick mpi using api, called only once
-    call setQuickMPI(quick_comm, mpirank, mpisize, ierr)
+    call setQuickMPI(MPI_COMM_WORLD, ierr)
     CHECK_ERROR(ierr)
 #endif
 
     ! set molecule size. We consider a water molecule surounded by 3 point
     ! charges in this test case. 
-    natoms      = 3
+    natoms = 3
     nxt_charges = 3    
 
     ! we consider 5 snapshots of this test system (mimics 5 md steps) 
@@ -85,25 +83,25 @@
     ! the first 3 columns are the xyz coordinates of the point charges. The
     ! fourth column is the charge. 
     if ( .not. allocated(atomic_numbers)) allocate(atomic_numbers(natoms), stat=ierr) 
-    if ( .not. allocated(coord))          allocate(coord(3,natoms), stat=ierr)
-    if ( .not. allocated(gradients))         allocate(gradients(3,natoms), stat=ierr)
+    if ( .not. allocated(coord)) allocate(coord(3,natoms), stat=ierr)
+    if ( .not. allocated(gradients)) allocate(gradients(3,natoms), stat=ierr)
     CHECK_ERROR(ierr)
 
     ! fill up memory with test values, coordinates and external charges will be loded inside 
     ! the loop below.
-    fname           = 'api_water_rhf_631g'
-    keywd           = 'HF BASIS=6-31G CUTOFF=1.0D-10 DENSERMS=1.0D-6 GRADIENT EXTCHARGES'
+    fname = 'api_water_rhf_631g'
+    keywd = 'HF BASIS=6-31G CUTOFF=1.0D-10 DENSERMS=1.0D-6 GRADIENT EXTCHARGES'
     !keywd =''
 
-    atomic_numbers(1)  = 8
-    atomic_numbers(2)  = 1
-    atomic_numbers(3)  = 1
+    atomic_numbers(1) = 8
+    atomic_numbers(2) = 1
+    atomic_numbers(3) = 1
 
     ! set result vectors and matrices to zero
-    gradients    = 0.0d0
+    gradients = 0.0d0
 
     ! reuse density matrix during MD
-    reuse_dmx=.true.
+    reuse_dmx = .true.
 
     ! initialize QUICK, required only once. Assumes keywords for
     ! the QUICK job are provided through a template file.  
@@ -111,7 +109,6 @@
     CHECK_ERROR(ierr)
 
     do i=1, frames
-
       ! load coordinates and external point charges for ith step
       nxt_charges = mod(i,4)
 
@@ -135,13 +132,13 @@
       ! print values obtained from quick library
 #ifdef MPIV
       ! dumb way to sequantially print from all cores..
-      call MPI_BARRIER(quick_comm, mpierror)
+      call MPI_BARRIER(quick_comm, quick_mpi_error)
 
-      do j=0, mpisize-1
-        if(j .eq. mpirank) then
-          call printQuickMPIOutput(natoms, nxt_charges, atomic_numbers, totEne, gradients, ptchgGrad, mpirank)
+      do j=0, quick_comm_size-1
+        if(j .eq. quick_comm_rank) then
+          call printQuickMPIOutput(natoms, nxt_charges, atomic_numbers, totEne, gradients, ptchgGrad, quick_comm_rank)
         endif
-        call MPI_BARRIER(quick_comm, mpierror)
+        call MPI_BARRIER(quick_comm, quick_mpi_error)
       enddo 
 #else
       call printQuickOutput(natoms, nxt_charges, atomic_numbers, totEne, gradients, ptchgGrad)

@@ -45,14 +45,16 @@ endif()
 
 cuda_add_library(xc_${QUICK_GPU_TARGET_NAME} STATIC ${LIBXC_GPU_SOURCES}
 	OPTIONS ${GPU_RDC_FLAGS} ${CUDA_DEVICE_CODE_FLAGS} -I${CMAKE_CURRENT_SOURCE_DIR}/..)
-
-if(MPI)
-	target_compile_definitions(xc_${QUICK_GPU_TARGET_NAME} PRIVATE MPIV_GPU ${QUICK_GPU_PLATFORM}_MPIV)
-	set_property(TARGET xc_${QUICK_GPU_TARGET_NAME} APPEND PROPERTY LINK_LIBRARIES ${MPI_CXX})
-else()
-	target_compile_definitions(xc_${QUICK_GPU_TARGET_NAME} PRIVATE GPU ${QUICK_GPU_PLATFORM})
-endif()
-
+target_compile_definitions(xc_${QUICK_GPU_TARGET_NAME} PRIVATE GPU ${QUICK_GPU_PLATFORM})
 if(INSIDE_AMBER)
 	target_link_libraries(xc_${QUICK_GPU_TARGET_NAME} libcew)
+endif()
+
+if(MPI)
+	make_mpi_version(xc_${QUICK_GPU_TARGET_NAME} xc_mpi_${QUICK_GPU_TARGET_NAME} LANGUAGES CXX)
+	target_compile_definitions(xc_mpi_${QUICK_GPU_TARGET_NAME} PRIVATE MPIV_GPU ${QUICK_GPU_PLATFORM}_MPIV)
+	target_include_directories(xc_mpi_${QUICK_GPU_TARGET_NAME} PRIVATE -I${CMAKE_CURRENT_SOURCE_DIR}/..)
+	if(INSIDE_AMBER)
+		target_link_libraries(xc_mpi_${QUICK_GPU_TARGET_NAME} libcew)
+	endif()
 endif()

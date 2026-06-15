@@ -11,11 +11,11 @@ if(MPI)
 	target_compile_definitions(quick_${QUICK_GPU_TARGET_NAME}_kernels_mpi PRIVATE MPIV_GPU ${QUICK_GPU_PLATFORM}_MPIV)
 	set_property(TARGET quick_${QUICK_GPU_TARGET_NAME}_kernels_mpi PROPERTY POSITION_INDEPENDENT_CODE TRUE)
         target_include_directories(quick_${QUICK_GPU_TARGET_NAME}_kernels_mpi PUBLIC ../iclass)
-	target_link_libraries(quick_${QUICK_GPU_TARGET_NAME}_kernels_mpi xc_gpu xc_${QUICK_GPU_TARGET_NAME})
+	target_link_libraries(quick_${QUICK_GPU_TARGET_NAME}_kernels_mpi xc_mpi_gpu xc_mpi_${QUICK_GPU_TARGET_NAME})
 
 	# the generator expressions in our MPI_CXX variable don't seem to work with CUDA files, so
 	# we have to link it directly
-	target_link_libraries(quick_${QUICK_GPU_TARGET_NAME}_kernels_mpi xc_gpu xc_${QUICK_GPU_TARGET_NAME} MPI::MPI_CXX)
+	target_link_libraries(quick_${QUICK_GPU_TARGET_NAME}_kernels_mpi xc_mpi_gpu xc_mpi_${QUICK_GPU_TARGET_NAME} MPI::MPI_CXX)
 endif()
 
 # CUBLAS fortran thunking

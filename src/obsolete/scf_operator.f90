@@ -30,8 +30,8 @@ subroutine scf_operator(deltaO)
    use quick_cutoff_module, only: cshell_density_cutoff
    use quick_eri_cshell_module, only: getCshellEri, getCshellEriEnergy 
 #ifdef MPIV
-   use mpi
    use quick_mpi_module, only: quick_comm
+   use mpi
 #endif
 
    implicit none
@@ -79,7 +79,7 @@ subroutine scf_operator(deltaO)
    call cshell_density_cutoff
 
 #ifdef MPIV
-   call MPI_BARRIER(quick_comm,mpierror)
+   call MPI_BARRIER(quick_comm,quick_mpi_error)
 #endif
 
 !  Start the timer for 2e-integrals
@@ -133,8 +133,8 @@ subroutine scf_operator(deltaO)
 !  Every nodes will take about jshell/nodes shells integrals such as 1 water, which has 
 !  4 jshell, and 2 nodes will take 2 jshell respectively.
    if(bMPI) then
-      do i=1,mpi_jshelln(mpirank)
-         ii=mpi_jshell(mpirank,i)
+      do i=1,mpi_jshelln(quick_comm_rank)
+         ii=mpi_jshell(quick_comm_rank,i)
          call getCshellEri(II)
       enddo
    else
@@ -163,7 +163,7 @@ subroutine scf_operator(deltaO)
    if (deltaO) quick_qm_struct%dense(:,:) = quick_qm_struct%denseSave(:,:)
 
 #ifdef MPIV
-   call MPI_BARRIER(quick_comm,mpierror)
+   call MPI_BARRIER(quick_comm,quick_mpi_error)
 #endif
 
 !  Terminate the timer for 2e-integrals
@@ -178,7 +178,7 @@ subroutine scf_operator(deltaO)
 !-----------------------------------------------------------------
 
 #ifdef MPIV
-   call MPI_BARRIER(quick_comm,mpierror)
+   call MPI_BARRIER(quick_comm,quick_mpi_error)
 #endif
 
    if (quick_method%DFT) then
@@ -194,7 +194,7 @@ subroutine scf_operator(deltaO)
 
 
 #ifdef MPIV
-   call MPI_BARRIER(quick_comm,mpierror)
+   call MPI_BARRIER(quick_comm,quick_mpi_error)
 #endif
 
 !  Stop the exchange correlation timer
@@ -207,7 +207,7 @@ subroutine scf_operator(deltaO)
 #ifdef MPIV
 !  MPI reduction operations
 
-   call MPI_BARRIER(quick_comm,mpierror)
+   call MPI_BARRIER(quick_comm,quick_mpi_error)
 
    call cpu_time(timer_begin%TEred)
 
@@ -328,8 +328,8 @@ subroutine get_xc
 
 #if defined(MPIV) && !defined(MPIV_GPU)
       if(bMPI) then
-         irad_init = quick_dft_grid%igridptll(mpirank+1)
-         irad_end = quick_dft_grid%igridptul(mpirank+1)
+         irad_init = quick_dft_grid%igridptll(quick_comm_rank+1)
+         irad_end = quick_dft_grid%igridptul(quick_comm_rank+1)
       else
          irad_init = 1
          irad_end = quick_dft_grid%nbins

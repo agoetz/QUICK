@@ -100,22 +100,23 @@ contains
   end subroutine load_test_data
 
 #ifdef MPIV
-  ! initialize mpi library and save mpirank and mpisize
-  subroutine mpi_initialize(mpisize, mpirank, master, mpierror)
-
-    use mpi
+  ! initialize mpi library and save quick_comm_rank and quick_comm_size
+  subroutine mpi_initialize(mpicomm, quick_comm_size, quick_comm_rank, master, quick_mpi_error)
     use quick_mpi_module, only: quick_comm
+    use mpi
+
     implicit none
 
-    integer, intent(inout) :: mpisize, mpirank, mpierror
+    integer, intent(in) :: mpicomm
+    integer, intent(inout) :: quick_comm_size, quick_comm_rank, quick_mpi_error
     logical, intent(inout) :: master
 
-    call MPI_INIT(mpierror)
-    call MPI_COMM_RANK(quick_comm,mpirank,mpierror)
-    call MPI_COMM_SIZE(quick_comm,mpisize,mpierror)
-    call MPI_BARRIER(quick_comm,mpierror)
+    call MPI_INIT(quick_mpi_error)
+    call MPI_Comm_dup(mpicomm, quick_comm, quick_mpi_error)
+    call MPI_COMM_RANK(quick_comm, quick_comm_rank, quick_mpi_error)
+    call MPI_COMM_SIZE(quick_comm, quick_comm_size, quick_mpi_error)
 
-    if(mpirank .eq. 0) then
+    if(quick_comm_rank .eq. 0) then
       master = .true.
     else
       master = .false.
@@ -124,18 +125,18 @@ contains
   end subroutine mpi_initialize
 
   ! prints mpi output sequentially
-  subroutine printQuickMPIOutput(natoms, nxt_charges, atomic_numbers, totEne, gradients, ptchg_grad, mpirank)
+  subroutine printQuickMPIOutput(natoms, nxt_charges, atomic_numbers, totEne, gradients, ptchg_grad, quick_comm_rank)
 
     implicit none
 
-    integer, intent(in)          :: natoms, nxt_charges, mpirank
+    integer, intent(in)          :: natoms, nxt_charges, quick_comm_rank
     integer, intent(in)          :: atomic_numbers(natoms)
     double precision, intent(in) :: totEne
     double precision, intent(in) :: gradients(3,natoms)
     double precision, intent(in) :: ptchg_grad(3,nxt_charges)
 
     write(*,*) ""
-    write(*,'(A11, 1X, I3, 1x, A3)') "--- MPIRANK", mpirank, "---"
+    write(*,'(A11, 1X, I3, 1x, A3)') "--- MPIRANK", quick_comm_rank, "---"
     write(*,*) ""
 
     call printQuickOutput(natoms, nxt_charges, atomic_numbers, totEne, gradients, ptchg_grad)
@@ -146,9 +147,9 @@ contains
 
     use mpi
     implicit none
-    integer :: mpierror
+    integer :: quick_mpi_error
 
-    call MPI_FINALIZE(mpierror)
+    call MPI_FINALIZE(quick_mpi_error)
     call exit(0)
 
   end subroutine mpi_exit

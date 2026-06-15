@@ -18,7 +18,7 @@
 #include "gpu_libxc_type.h"
 
 #include <cuda.h>
-#if defined(MPIV_GPU)
+#if !defined(BUILD_LIBXC) && defined(MPIV_GPU)
   #include <mpi.h>
 #endif
 
@@ -359,8 +359,8 @@ struct gpu_simulation_type {
 #endif
 
     // mpi variable definitions
-    int mpirank;
-    int mpisize;
+    int quick_comm_rank;
+    int quick_comm_size;
 
     // multi-GPU variables
     unsigned char *mpi_bcompute;
@@ -464,11 +464,11 @@ struct gpu_type {
     unsigned int xc_threadsPerBlock; //Num of threads/block for octree based dft implementation
     unsigned int sswGradThreadsPerBlock;
     // mpi variable definitions
-#if defined(MPIV_GPU)
+#if !defined(BUILD_LIBXC) && defined(MPIV_GPU)
     MPI_Comm mpi_comm;
 #endif
-    int mpirank;
-    int mpisize;
+    int quick_comm_rank;
+    int quick_comm_size;
     // timer
     gpu_timer_type *timer;
     // Molecule specification part

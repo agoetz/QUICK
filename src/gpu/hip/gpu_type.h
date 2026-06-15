@@ -359,8 +359,8 @@ struct gpu_simulation_type {
 #endif
 
     // mpi variable definitions
-    int mpirank;
-    int mpisize;
+    int quick_comm_rank;
+    int quick_comm_size;
 
     // multi-GPU variables
     unsigned char *mpi_bcompute;
@@ -467,8 +467,8 @@ struct gpu_type {
 #if defined(MPIV_GPU)
     MPI_Comm mpi_comm;
 #endif
-    int mpirank;
-    int mpisize;
+    int quick_comm_rank;
+    int quick_comm_size;
     // timer
     gpu_timer_type *timer;
     // Molecule specification part

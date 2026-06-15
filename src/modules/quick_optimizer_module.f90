@@ -38,9 +38,11 @@ contains
      use quick_grad_oshell_module, only: uscf_gradient
      use quick_exception_module
      use quick_molden_module, only: quick_molden
-#ifdef MPIV
+#if defined(MPIV)
+     use quick_mpi_module, only: master, quick_comm
      use mpi
-     use quick_mpi_module, only: quick_comm
+#else
+     use quick_mpi_module, only: master
 #endif
      use quick_io_module, only: chk_append_opt_traj
      implicit double precision(a-h,o-z)
@@ -340,11 +342,11 @@ contains
         !-------------- END MPI/MASTER --------------------
 #ifdef MPIV
         ! we now have new geometry, and let other nodes know the new geometry
-        if (bMPI)call MPI_BCAST(xyz,natom*3,mpi_double_precision,0,quick_comm,mpierror)
+        if (bMPI)call MPI_BCAST(xyz,natom*3,mpi_double_precision,0,quick_comm,quick_mpi_error)
 
 
         ! Notify every nodes if opt is done
-        if (bMPI)call MPI_BCAST(done,1,mpi_logical,0,quick_comm,mpierror)
+        if (bMPI)call MPI_BCAST(done,1,mpi_logical,0,quick_comm,quick_mpi_error)
 #endif
 
         !For DFT geometry optimization, we should delete the grid variables here

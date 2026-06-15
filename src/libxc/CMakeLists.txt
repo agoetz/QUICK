@@ -112,9 +112,9 @@ set(LIBXC_FORTRAN_SOURCES
 	libxc.f90)
 
 if(CUDA)
-	set(LIBXC_GPU_SOURCES gpu.c ../gpu/cuda/gpu_utils.cu)
+	set(LIBXC_GPU_SOURCES gpu.c)
 elseif(HIP)
-	set(LIBXC_GPU_SOURCES gpu.c ../gpu/hip/gpu_utils.cu)
+	set(LIBXC_GPU_SOURCES gpu.c)
 endif()
 
 # -------------------------------------------------------------

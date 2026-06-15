@@ -16,8 +16,11 @@ subroutine getMol(ierr)
    use quick_gridpoints_module
    use quick_exception_module
    use quick_io_module, only: chk_read, chk_read_opt_traj
-#ifdef MPIV
+#if defined(MPIV)
+   use quick_mpi_module, only: bMPI, master
    use mpi
+#else
+   use quick_mpi_module, only: master
 #endif
 
    implicit none
@@ -236,7 +239,10 @@ subroutine initialGuess(ierr)
    use quick_sad_guess_module, only: getSadDense
    use quick_exception_module
    use quick_io_module, only: chk_read
+   use quick_mpi_module, only: master
+
    implicit none
+
    logical :: present
    integer :: failed, fail
    character(len=80) :: keyWD

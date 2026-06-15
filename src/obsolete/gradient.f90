@@ -192,7 +192,7 @@ endif
 !  3) The derivative of the electron repulsion term
 !---------------------------------------------------------------------
 #ifdef MPIV
-   call MPI_BARRIER(quick_comm,mpierror)
+   call MPI_BARRIER(quick_comm,quick_mpi_error)
 #endif
 
    call cpu_time(timer_begin%T2eGrad)
@@ -205,7 +205,7 @@ endif
 !  4) If DFT, calculate the derivative of exchahnge correlation  term
 !---------------------------------------------------------------------
 #ifdef MPIV
-   call MPI_BARRIER(quick_comm,mpierror)
+   call MPI_BARRIER(quick_comm,quick_mpi_error)
 #endif
 
    if (quick_method%DFT) then
@@ -225,7 +225,7 @@ endif
 
 #ifdef MPIV
 
-   call MPI_BARRIER(quick_comm,mpierror)
+   call MPI_BARRIER(quick_comm,quick_mpi_error)
 
    call cpu_time(timer_begin%TGradred) 
 
@@ -246,7 +246,7 @@ endif
 
 !!!!!!!!!!!!!!!!!!!!!!!Madu!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 #ifdef MPIV
-!   call MPI_BARRIER(quick_comm,mpierror)
+!   call MPI_BARRIER(quick_comm,quick_mpi_error)
 if(master) then
 #endif
 
@@ -380,20 +380,19 @@ end subroutine get_nuclear_repulsion_grad
 
 
 subroutine get_oneen_grad
-
   use allmod
 #ifdef MPIV
    use mpi
 #endif
+
   implicit none
+
   integer :: Iatm, Imomentum, IIsh, JJsh, i, j, nshell_mpi
 
 !---------------------------------------------------------------------
 !  1) The derivative of the kinetic term
 !---------------------------------------------------------------------
-
    call cpu_time(timer_begin%T1eGrad)
-
    call cpu_time(timer_begin%T1eTGrad)
 
    call get_kinetic_grad
@@ -430,14 +429,14 @@ endif
 
 #ifdef MPIV
    if (bMPI) then
-      nshell_mpi = mpi_jshelln(mpirank)
+      nshell_mpi = mpi_jshelln(quick_comm_rank)
    else
       nshell_mpi = jshell
    endif
 
    do i=1,nshell_mpi
       if (bMPI) then
-         IIsh = mpi_jshell(mpirank,i)
+         IIsh = mpi_jshell(quick_comm_rank,i)
       else
          IIsh = i
       endif
@@ -453,7 +452,7 @@ endif
    timer_cumer%T1eVGrad=timer_cumer%T1eVGrad+timer_end%T1eVGrad-timer_begin%T1eVGrad
 
 #ifdef MPIV
-   call MPI_BARRIER(quick_comm,mpierror)
+   call MPI_BARRIER(quick_comm,quick_mpi_error)
 #endif
 
 #ifdef MPIV
@@ -529,7 +528,7 @@ subroutine get_kinetic_grad
    enddo
 #ifdef MPIV
    endif
-   call MPI_BCAST(quick_scratch%hold,nbasis*nbasis,mpi_double_precision,0,quick_comm,mpierror)
+   call MPI_BCAST(quick_scratch%hold,nbasis*nbasis,mpi_double_precision,0,quick_comm,quick_mpi_error)
 #endif
 
    if (quick_method%debug) then
@@ -556,14 +555,14 @@ subroutine get_kinetic_grad
 !  Note that the negative on the final term comes from the form of (x-XA).
 #ifdef MPIV
    if (bMPI) then
-      nbasis_mpi = mpi_nbasisn(mpirank)
+      nbasis_mpi = mpi_nbasisn(quick_comm_rank)
    else
       nbasis_mpi = nbasis
    endif
 
    do i=1,nbasis_mpi
       if (bMPI) then
-         Ibas = mpi_nbasis(mpirank,i)
+         Ibas = mpi_nbasis(quick_comm_rank,i)
       else
          Ibas = i
    endif
@@ -593,7 +592,7 @@ subroutine get_kinetic_grad
       enddo
 
 #ifdef MPIV
-   call MPI_BARRIER(quick_comm,mpierror)
+   call MPI_BARRIER(quick_comm,quick_mpi_error)
 #endif
 
    return
@@ -602,14 +601,14 @@ end subroutine get_kinetic_grad
 
 
 subroutine get_electron_replusion_grad
-
    use allmod
    use quick_grad_cshell_module
    use quick_cutoff_module, only: cshell_dnscreen
 #ifdef MPIV
-   use mpi
    use quick_mpi_module, only: quick_comm
+   use mpi
 #endif
+
    implicit double precision(a-h,o-z)
 
    integer II,JJ,KK,LL,NBI1,NBI2,NBJ1,NBJ2,NBK1,NBK2,NBL1,NBL2
@@ -654,16 +653,15 @@ subroutine get_electron_replusion_grad
 #endif
 
 #if defined(MPIV) && !defined(MPIV_GPU)
-
    if (bMPI) then
-      nshell_mpi = mpi_jshelln(mpirank)
+      nshell_mpi = mpi_jshelln(quick_comm_rank)
    else
       nshell_mpi = jshell
    endif
 
    do i=1,nshell_mpi
       if (bMPI) then
-         II = mpi_jshell(mpirank,i)
+         II = mpi_jshell(quick_comm_rank,i)
       else
          II = i
    endif
@@ -697,7 +695,7 @@ subroutine get_electron_replusion_grad
 #endif
 
 #ifdef MPIV
-   call MPI_BARRIER(quick_comm,mpierror)
+   call MPI_BARRIER(quick_comm,quick_mpi_error)
 #endif
 
    return
@@ -786,8 +784,8 @@ quick_method%xc_polarization)
 
 #if defined(MPIV) && !defined(MPIV_GPU)
       if(bMPI) then
-         irad_init = quick_dft_grid%igridptll(mpirank+1)
-         irad_end = quick_dft_grid%igridptul(mpirank+1)
+         irad_init = quick_dft_grid%igridptll(quick_comm_rank+1)
+         irad_end = quick_dft_grid%igridptul(quick_comm_rank+1)
       else
          irad_init = 1
          irad_end = quick_dft_grid%nbins
