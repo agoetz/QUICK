@@ -25,7 +25,7 @@ module quick_grad_oshell_module
 #else
 module quick_grad_cshell_module
 #endif
-  implicit double precision(a-h,o-z)
+  implicit none
 
   private
 
@@ -196,10 +196,13 @@ contains
      use mpi
 #endif
 
-     implicit double precision(a-h,o-z)
+     implicit none
   
      integer II,JJ,KK,LL,NBI1,NBI2,NBJ1,NBJ2,NBK1,NBK2,NBL1,NBL2,ierr
      common /hrrstore/II,JJ,KK,LL,NBI1,NBI2,NBJ1,NBJ2,NBK1,NBK2,NBL1,NBL2
+#if defined(MPIV)
+     integer :: IERROR
+#endif
   
   !---------------------------------------------------------------------
   !  The purpose of this subroutine is to calculate the gradient of
@@ -437,11 +440,13 @@ contains
      use allmod
      use quick_mpi_module, only: master
 
-     implicit double precision(a-h,o-z)
+     implicit none
   
      double precision, external :: rootSquare
      integer II,JJ,KK,LL,NBI1,NBI2,NBJ1,NBJ2,NBK1,NBK2,NBL1,NBL2
      common /hrrstore/II,JJ,KK,LL,NBI1,NBI2,NBJ1,NBJ2,NBK1,NBK2,NBL1,NBL2
+     integer :: Iatm,Jatm,ISTART,JSTART
+     double precision :: rij, XBminXA, YBminYA, ZBminZA, ZAZBdivRIJ3
   
   !  This subroutine calculates the nuclear repulsion gradients. 
   
@@ -529,6 +534,7 @@ contains
     use quick_cutoff_module, only: cshell_density_cutoff
 #endif
 #if defined(MPIV)
+    use quick_basis_module, only: mpi_jshell, mpi_jshelln
     use quick_mpi_module, only: bMPI, master, quick_mpi_error, quick_comm_rank, quick_comm
     use mpi
 #endif
@@ -697,15 +703,21 @@ contains
      use quick_grad_cshell_module, only: get_ijbas_derivative
 #endif
 #if defined(MPIV)
+     use quick_basis_module, only: mpi_jshell, mpi_jshelln, mpi_nbasis, mpi_nbasisn
      use quick_mpi_module, only: bMPI, master, quick_mpi_error, quick_comm_rank, quick_comm
      use mpi
 #endif
 
-     implicit double precision(a-h,o-z)
+     implicit none
   
-     integer II,JJ,KK,LL,NBI1,NBI2,NBJ1,NBJ2,NBK1,NBK2,NBL1,NBL2
+     integer I,II,J,JJ,K,KK,LL,NBI1,NBI2,NBJ1,NBJ2,NBK1,NBK2,NBL1,NBL2
+     integer Imomentum, Ibas, Jbas, ISTART, JSTART
+     double precision :: DENSEJI, HOLDJI
      common /hrrstore/II,JJ,KK,LL,NBI1,NBI2,NBJ1,NBJ2,NBK1,NBK2,NBL1,NBL2
      logical :: ijcon
+#if defined(MPIV)
+     integer :: nbasis_mpi
+#endif
   
   !  1)  The negative of the energy weighted density matrix element i j
   !   with the derivative of the ij overlap.
@@ -849,10 +861,14 @@ contains
    use mpi
 #endif
 
-     implicit double precision(a-h,o-z)
+     implicit none
   
      integer II,JJ,KK,LL,NBI1,NBI2,NBJ1,NBJ2,NBK1,NBK2,NBL1,NBL2
      common /hrrstore/II,JJ,KK,LL,NBI1,NBI2,NBJ1,NBJ2,NBK1,NBK2,NBL1,NBL2
+     double precision :: cutoffTest, testCutoff, Testtmp
+#if defined(MPIV) && !defined(MPIV_GPU)
+     integer :: i, nshell_mpi
+#endif
   
   !  This subroutine calculates the derivative of 4center 2e- 
   !  terms with respect to X times the coefficient found in the energy.
@@ -1423,10 +1439,15 @@ contains
      use allmod
      use quick_overlap_module, only: gpt, opf, overlap
      use quick_oei_module, only: ekinetic
-     implicit double precision(a-h,o-z)
-     logical :: ijcon   
-     double precision g_table(200), valopf
-     integer i,j,k,ii,jj,kk,g_count
+
+     implicit none
+     integer, intent(in) :: Imomentum, Ibas, Jbas, mbas, mstart
+     double precision, intent(in) :: DENSEJI
+     logical, intent(in) :: ijcon   
+
+     double precision :: g_table(200), valopf, a, b, dKEM, dSM
+     integer :: i,j,k,ii,jj,kk,g_count,Icon,Jcon,mcon
+     double precision :: Ax, Ay, Az, Bx, By, Bz, Px, Py, Pz
   
      dSM = 0.0d0
      dKEM = 0.0d0

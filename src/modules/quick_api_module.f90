@@ -175,7 +175,7 @@ subroutine set_quick_job(fqin, keywd, natoms, atomic_numbers, reusedmx, ierr)
   use quick_exception_module
   use quick_method_module
 #if defined(MPIV)
-  use quick_mpi_module, only: bMPI, master, mgpu_id, mgpu_ids, \
+  use quick_mpi_module, only: bMPI, master, mgpu_id, mgpu_ids, &
         mpi_world_rank, print_quick_mpi, quick_comm, quick_comm_rank, quick_comm_size
 #endif
 

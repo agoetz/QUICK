@@ -72,6 +72,7 @@ subroutine get1e(deltaO)
    use quick_cew_module, only : quick_cew, quick_cew_prescf
 #endif
 #if defined(MPIV)
+   use quick_basis_module, only: mpi_jshell, mpi_jshelln, mpi_nbasis, mpi_nbasisn
    use quick_mpi_module, only: bMPI, master, quick_comm_rank
    use mpi
 #else

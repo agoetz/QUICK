@@ -27,7 +27,6 @@
 !    electrondensity: Electron Density
 !    divpb_interface: Div_PB modules 
 !    divpb_private  :
-!    MPI_module     : MPI module
 !    timer          : timer module
 !    AMBER_interface_module
 !                   : AMBER interface module
