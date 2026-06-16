@@ -139,9 +139,12 @@ module quick_timer_module
         double precision :: t_tot_dftop, t_tot_lb
         
 #ifdef MPIV
-        double precision :: tst2e(quick_comm_size), tstxc(quick_comm_size), tst2egrad(quick_comm_size), tstxcgrad(quick_comm_size)
-        double precision :: tend2e(quick_comm_size), tendxc(quick_comm_size), tend2egrad(quick_comm_size), tendxcgrad(quick_comm_size)
-        double precision :: t2e(quick_comm_size), txc(quick_comm_size), t2egrad(quick_comm_size), txcgrad(quick_comm_size)
+        double precision :: tst2e(quick_comm_size), tstxc(quick_comm_size) 
+        double precision :: tst2egrad(quick_comm_size), tstxcgrad(quick_comm_size)
+        double precision :: tend2e(quick_comm_size), tendxc(quick_comm_size)
+        double precision :: tend2egrad(quick_comm_size), tendxcgrad(quick_comm_size)
+        double precision :: t2e(quick_comm_size), txc(quick_comm_size)
+        double precision :: t2egrad(quick_comm_size), txcgrad(quick_comm_size)
 #endif
         type (quick_timer) tmp_timer
         type (quick_timer_cumer) tmp_timer_cumer,max_timer_cumer
