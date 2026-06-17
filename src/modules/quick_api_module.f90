@@ -175,8 +175,11 @@ subroutine set_quick_job(fqin, keywd, natoms, atomic_numbers, reusedmx, ierr)
   use quick_exception_module
   use quick_method_module
 #if defined(MPIV)
-  use quick_mpi_module, only: bMPI, master, mgpu_id, mgpu_ids, &
-        mpi_world_rank, print_quick_mpi, quick_comm, quick_comm_rank, quick_comm_size
+  use quick_mpi_module, only: bMPI, master, print_quick_mpi
+#  if defined(MPIV_GPU)
+  use quick_mpi_module, only: mgpu_id, mgpu_ids, &
+        mpi_world_rank, quick_comm, quick_comm_rank, quick_comm_size
+#  endif
 #endif
 
   implicit none
@@ -752,8 +755,8 @@ end subroutine gpu_upload_molspecs
 #ifdef MPIV
 ! sets mpi variables in quick api
 subroutine set_quick_mpi(quick_mpi_comm, ierr)
-  use quick_mpi_module, only: libMPIMode, mpi_world_rank, mpi_world_size, \
-        quick_mpi_error, quick_comm_rank, quick_comm_size, quick_comm
+  use quick_mpi_module, only: libMPIMode, mpi_world_rank, mpi_world_size, &
+        quick_comm, quick_comm_rank, quick_comm_size, quick_mpi_error
   use mpi
 
   implicit none

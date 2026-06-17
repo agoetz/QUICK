@@ -140,18 +140,18 @@ contains
     write(*,*) ""
 
     call printQuickOutput(natoms, nxt_charges, atomic_numbers, totEne, gradients, ptchg_grad)
-
   end subroutine printQuickMPIOutput
 
-  subroutine mpi_exit
 
+  subroutine mpi_exit
     use mpi
+
     implicit none
+
     integer :: quick_mpi_error
 
     call MPI_FINALIZE(quick_mpi_error)
     call exit(0)
-
   end subroutine mpi_exit
 
 #endif

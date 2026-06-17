@@ -25,8 +25,8 @@ subroutine gradient(ierr)
 
    use allmod
 #ifdef MPIV
-   use mpi
    use quick_mpi_module, only: quick_comm
+   use mpi
 #endif
    implicit double precision(a-h,o-z)
 
@@ -116,8 +116,8 @@ subroutine scf_gradient
    use allmod
    use quick_grad_cshell_module
 #ifdef MPIV
+   use quick_mpi_module, only: quick_comm, quick_mpi_error
    use mpi
-   use quick_mpi_module, only: quick_comm
 #endif
    implicit double precision(a-h,o-z)
 
@@ -298,9 +298,11 @@ endif
 
 end subroutine scf_gradient
 
-subroutine get_nuclear_repulsion_grad
 
+subroutine get_nuclear_repulsion_grad
    use allmod
+   use quick_mpi_module, only: quick_mpi_rank
+
    implicit double precision(a-h,o-z)
 
    double precision, external :: rootSquare
@@ -382,7 +384,8 @@ end subroutine get_nuclear_repulsion_grad
 subroutine get_oneen_grad
   use allmod
 #ifdef MPIV
-   use mpi
+  use quick_mpi_module, only: master, quick_comm, quick_comm_rank, quick_mpi_error
+  use mpi
 #endif
 
   implicit none
@@ -487,8 +490,8 @@ subroutine get_kinetic_grad
 
    use allmod
 #ifdef MPIV
+   use quick_mpi_module, only: quick_comm, quick_comm_rank
    use mpi
-   use quick_mpi_module, only: quick_comm
 #endif
    implicit double precision(a-h,o-z)
 
@@ -744,8 +747,8 @@ subroutine get_xc_grad
    use xc_f90_types_m
    use xc_f90_lib_m
 #ifdef MPIV
-   use mpi
    use quick_mpi_module, only: quick_comm
+   use mpi
 #endif
    implicit double precision(a-h,o-z)
 

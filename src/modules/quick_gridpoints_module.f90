@@ -23,7 +23,7 @@ module quick_gridpoints_module
 ! radii and radii^3 of the atoms.
 
     use quick_size_module
-    use quick_MPI_module
+
     implicit double precision(a-h,o-z)
 
     type quick_xc_grid_type
@@ -148,13 +148,14 @@ module quick_gridpoints_module
     use quick_basis_module
     use quick_timer_module
 #if defined(MPIV)
-    use quick_mpi_module, only: bMPI, master, quick_comm_rank, quick_comm
+    use quick_mpi_module, only: bMPI, master, quick_comm, quick_comm_rank
 #endif
 
     implicit double precision(a-h,o-z)
 
-    type(quick_xc_grid_type) self
-    type(quick_xcg_tmp_type) xcg_tmp
+    type(quick_xc_grid_type), intent(inout) :: self
+    type(quick_xcg_tmp_type), intent(inout) :: xcg_tmp
+
     double precision :: t_octree, t_prscrn
 
     !Form the quadrature and store coordinates and other information
@@ -328,7 +329,7 @@ module quick_gridpoints_module
 #if defined(MPIV_GPU)
    if(master) then
 #endif
-    ! save packed grid information into f90 data structures
+     ! save packed grid information into f90 data structures
      call get_gpu_grid_info(self%gridxb, self%gridyb, self%gridzb, self%gridb_sswt, self%gridb_weight, self%gridb_atm, &
      self%bin_locator, self%basf, self%primf, self%basf_counter, self%primf_counter, self%bin_counter)
 #if defined(MPIV_GPU)
@@ -473,7 +474,8 @@ module quick_gridpoints_module
 
         implicit none
 
-        type(quick_xcg_tmp_type) xcg_tmp
+        type(quick_xcg_tmp_type), intent(inout) :: xcg_tmp
+
         integer :: tot_gps
 
         tot_gps = natom*xcg_tmp%rad_gps*xcg_tmp%ang_gps

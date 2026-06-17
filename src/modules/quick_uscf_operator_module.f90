@@ -37,7 +37,7 @@ contains
      use quick_eri_oshell_module, only: getOshellEri, getOshellEriEnergy 
      use quick_oei_module, only: get1eEnergy, get1e
 #if defined(MPIV)
-     use quick_mpi_module, only: bMPI, master, quick_mpi_error, quick_comm_rank, quick_comm
+     use quick_mpi_module, only: bMPI, master, quick_comm, quick_comm_rank, quick_mpi_error
      use mpi
 #endif
   
@@ -284,7 +284,7 @@ contains
      use xc_f90_types_m
      use xc_f90_lib_m
 #if defined(MPIV)
-     use quick_mpi_module, only: quick_comm_rank, quick_comm
+     use quick_mpi_module, only: bMPI, quick_comm, quick_comm_rank
 #endif
 
      implicit none

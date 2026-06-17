@@ -83,6 +83,7 @@ contains
 #else
   subroutine cshell_gradient(ierr)
 #endif
+     use allmod
      use quick_calculated_module, only: quick_qm_struct
      use quick_files_module, only: ioutfile
      use quick_method_module, only: quick_method
@@ -202,6 +203,9 @@ contains
      common /hrrstore/II,JJ,KK,LL,NBI1,NBI2,NBJ1,NBJ2,NBK1,NBK2,NBL1,NBL2
 #if defined(MPIV)
      integer :: IERROR
+#endif
+#if defined(DEBUG)
+     integer :: Iatm, Imomentum
 #endif
   
   !---------------------------------------------------------------------
@@ -534,7 +538,6 @@ contains
     use quick_cutoff_module, only: cshell_density_cutoff
 #endif
 #if defined(MPIV)
-    use quick_basis_module, only: mpi_jshell, mpi_jshelln
     use quick_mpi_module, only: bMPI, master, quick_mpi_error, quick_comm_rank, quick_comm
     use mpi
 #endif
@@ -703,7 +706,6 @@ contains
      use quick_grad_cshell_module, only: get_ijbas_derivative
 #endif
 #if defined(MPIV)
-     use quick_basis_module, only: mpi_jshell, mpi_jshelln, mpi_nbasis, mpi_nbasisn
      use quick_mpi_module, only: bMPI, master, quick_mpi_error, quick_comm_rank, quick_comm
      use mpi
 #endif
@@ -868,6 +870,9 @@ contains
      double precision :: cutoffTest, testCutoff, Testtmp
 #if defined(MPIV) && !defined(MPIV_GPU)
      integer :: i, nshell_mpi
+#endif
+#if defined(DEBUG)
+     integer :: Iatm, Imomentum
 #endif
   
   !  This subroutine calculates the derivative of 4center 2e- 

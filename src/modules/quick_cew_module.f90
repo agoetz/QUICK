@@ -125,7 +125,7 @@ contains
     use quick_basis_module
     use quick_method_module, only: quick_method
 #if defined(MPIV)
-    use quick_mpi_module, only: quick_comm, quick_mpi_error
+    use quick_mpi_module, only: quick_comm, quick_comm_rank, quick_mpi_error
     use mpi
 #endif    
 
@@ -407,7 +407,7 @@ contains
    use quick_gridpoints_module, only : quick_dft_grid
    use quick_molspec_module, only : quick_molspec
 #if defined(MPIV)
-   use quick_mpi_module, only: bMPI
+   use quick_mpi_module, only: bMPI, quick_comm_rank
    use mpi
 #endif
 
@@ -571,6 +571,9 @@ contains
     !use quick_lri_grad_module, only: computeLRINumGrad
     use quick_gridpoints_module, only : quick_dft_grid
     use quick_method_module, only: quick_method
+#if defined(MPIV)
+   use quick_mpi_module, only: quick_comm_rank
+#endif
 
     implicit none
 
@@ -890,7 +893,7 @@ contains
    use quick_calculated_module, only : quick_qm_struct
    use quick_molspec_module, only : quick_molspec
 #if defined(MPIV)
-   use quick_mpi_module, only: bMPI
+   use quick_mpi_module, only: bMPI, quick_comm_rank
    use mpi
 #endif
    

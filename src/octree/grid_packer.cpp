@@ -37,26 +37,18 @@ void gpack_initialize_()
 
 #if defined(MPIV) && !defined(MPIV_GPU)
     mpi_comm = MPI_Comm_f2c((MPI_Fint) (*comm_f));
-
-    if (mpi_comm == MPI_COMM_NULL) {
-        return;
-    }
-
     MPI_Comm_rank(mpi_comm, &mpi_rank);
     MPI_Comm_size(mpi_comm, &mpi_size);
 #endif
 
-// setup debug file if necessary
 #ifdef DEBUG
-
-#if defined(MPIV) && !defined(MPIV_GPU)
+#  if defined(MPIV) && !defined(MPIV_GPU)
     char fname[16];
     sprintf(fname, "debug.oct.%i", mpi_rank);
     gpackDebugFile = fopen(fname, "w+");
-#else
+#  else
     gpackDebugFile = fopen("debug.oct", "w+");
-#endif
-
+#  endif
     gps->gpackDebugFile = gpackDebugFile;
 #endif
 }
@@ -74,8 +66,7 @@ void gpack_finalize_()
     delete gps->itype;
 
 #if defined(MPIV) && !defined(MPIV_GPU)
-    if(mpi_rank == 0)
-    {
+    if (mpi_rank == 0) {
 #endif
       delete gps->gridx;
       delete gps->gridy;
@@ -98,11 +89,9 @@ void gpack_finalize_()
 #if defined(MPIV) && !defined(MPIV_GPU)
     }
 #endif
-
 #if defined(GPU) || defined(MPIV_GPU)
     delete gps->bin_locator;    
 #endif
-
     delete gps;
 
 #ifdef DEBUG
@@ -156,25 +145,30 @@ void get_cpu_grid_info_(double *gridx, double *gridy, double *gridz, double *ssw
 
 
 /*Fortran accessible method to pack grid points*/
-void gpack_pack_pts_(double *grid_ptx, double *grid_pty, double *grid_ptz, int *grid_atm, double *grid_sswt, double *grid_weight, int *arr_size, int *natoms, int *nbasis, int *maxcontract, double *DMCutoff, double *XCCutoff, double *sigrad2, int *ncontract, double *aexp, double *dcoeff, int *ncenter, int *itype, double *xyz, int *ngpts, int *nbins, int *nbtotbf, int *nbtotpf, double *toct, double *tprscrn){
+void gpack_pack_pts_(double *grid_ptx, double *grid_pty, double *grid_ptz, int
+        *grid_atm, double *grid_sswt, double *grid_weight, int *arr_size, int
+        *natoms, int *nbasis, int *maxcontract, double *DMCutoff, double
+        *XCCutoff, double *sigrad2, int *ncontract, double *aexp, double
+        *dcoeff, int *ncenter, int *itype, double *xyz, int *ngpts, int *nbins,
+        int *nbtotbf, int *nbtotpf, double *toct, double *tprscrn)
+{
+    gps->arr_size    = *arr_size;
+    gps->natoms      = *natoms;
+    gps->nbasis      = *nbasis;
+    gps->maxcontract = *maxcontract;
+    gps->DMCutoff    = *DMCutoff;
+    gps->XCCutoff   = *XCCutoff;
 
-        gps->arr_size    = *arr_size;
-        gps->natoms      = *natoms;
-        gps->nbasis      = *nbasis;
-        gps->maxcontract = *maxcontract;
-        gps->DMCutoff    = *DMCutoff;
-        gps->XCCutoff   = *XCCutoff;
-
-        gps->sigrad2     = new gpack_buffer_type<double>(sigrad2, gps->nbasis);
-        gps->ncontract   = new gpack_buffer_type<int>(ncontract, gps->nbasis);
-        gps->aexp        = new gpack_buffer_type<double>(aexp, gps->maxcontract, gps->nbasis);
-        gps->dcoeff      = new gpack_buffer_type<double>(dcoeff, gps->maxcontract, gps->nbasis);
-        gps->xyz         = new gpack_buffer_type<double>(xyz, 3, gps->natoms);
-        gps->ncenter     = new gpack_buffer_type<int>(ncenter, gps->nbasis);
-        gps->itype       = new gpack_buffer_type<int>(itype, 3, gps->nbasis);
+    gps->sigrad2     = new gpack_buffer_type<double>(sigrad2, gps->nbasis);
+    gps->ncontract   = new gpack_buffer_type<int>(ncontract, gps->nbasis);
+    gps->aexp        = new gpack_buffer_type<double>(aexp, gps->maxcontract, gps->nbasis);
+    gps->dcoeff      = new gpack_buffer_type<double>(dcoeff, gps->maxcontract, gps->nbasis);
+    gps->xyz         = new gpack_buffer_type<double>(xyz, 3, gps->natoms);
+    gps->ncenter     = new gpack_buffer_type<int>(ncenter, gps->nbasis);
+    gps->itype       = new gpack_buffer_type<int>(itype, 3, gps->nbasis);
 
 #if defined(MPIV) && !defined(MPIV_GPU)
-    if(mpi_rank==0){
+    if (mpi_rank == 0) {
 #endif
         gps->gridx       = new gpack_buffer_type<double>(grid_ptx, gps->arr_size);
         gps->gridy       = new gpack_buffer_type<double>(grid_pty, gps->arr_size);
@@ -184,29 +178,26 @@ void gpack_pack_pts_(double *grid_ptx, double *grid_pty, double *grid_ptz, int *
         gps->grid_atm    = new gpack_buffer_type<int>(grid_atm, gps->arr_size);
 
         get_ssw_pruned_grid();
-
 #if defined(MPIV) && !defined(MPIV_GPU)
     }
 #endif
 
-        pack_grid_pts();
+    pack_grid_pts();
 
 #if defined(MPIV) && !defined(MPIV_GPU)
-    if(mpi_rank==0){
+    if (mpi_rank ==0 ) {
 #endif
-
 	*ngpts   = gps->gridb_count;
 	*nbins   = gps->nbins;
 	*nbtotbf = gps->nbtotbf;
 	*nbtotpf = gps->nbtotpf;
 	*toct    = gps->time_octree;
 	*tprscrn = gps->time_bfpf_prescreen;
-
 #if defined(MPIV) && !defined(MPIV_GPU)
    }
 #endif
-
 }
+
 
 //Prints the spatial grid used to generate the octree.
 void write_vmd_grid(vector<node> octree, string filename){

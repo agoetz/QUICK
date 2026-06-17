@@ -71,12 +71,10 @@ subroutine get1e(deltaO)
 #ifdef CEW
    use quick_cew_module, only : quick_cew, quick_cew_prescf
 #endif
-#if defined(MPIV)
-   use quick_basis_module, only: mpi_jshell, mpi_jshelln, mpi_nbasis, mpi_nbasisn
-   use quick_mpi_module, only: bMPI, master, quick_comm_rank
-   use mpi
-#else
    use quick_mpi_module, only: master
+#if defined(MPIV)
+   use quick_mpi_module, only: bMPI, quick_comm_rank
+   use mpi
 #endif
    
    implicit double precision(a-h,o-z)

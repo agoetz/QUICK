@@ -58,9 +58,10 @@ subroutine electdiis(jscf,ierr)
    use allmod
    use quick_gridpoints_module
    use quick_scf_module
+   use quick_mpi_module, only: master
 #ifdef MPIV
+   use quick_mpi_module, only: bMPI, quick_comm, quick_mpi_error
    use mpi
-   use quick_mpi_module, only: quick_comm
 #endif
 
    implicit none

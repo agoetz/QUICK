@@ -71,13 +71,13 @@ contains
  ! Recurrence Relations. J. Chem. Phys. 1988, 89, 5777–5786.
  !__________________________________________________________________
 subroutine get_eri_precomputables
+   use allmod
    use quick_basis_module
    use quick_molspec_module, only: xyz
-#if defined(MPIV)
-   use quick_mpi_module, only: bMPI, master, quick_mpi_error, quick_comm
-   use mpi
-#else
    use quick_mpi_module, only: master
+#if defined(MPIV)
+   use quick_mpi_module, only: bMPI, quick_mpi_error, quick_comm
+   use mpi
 #endif
 
    implicit none

@@ -138,11 +138,10 @@ contains
      use quick_scf_module  
      use quick_oei_module, only: bCalc1e
      use quick_molden_module, only: quick_molden
-#ifdef MPIV
-     use quick_mpi_module, only: bMPI, master, quick_comm, quick_mpi_error
-     use mpi
-#else
      use quick_mpi_module, only: master
+#ifdef MPIV
+     use quick_mpi_module, only: bMPI, quick_comm, quick_mpi_error
+     use mpi
 #endif
      use quick_io_module, only: chk_update
 

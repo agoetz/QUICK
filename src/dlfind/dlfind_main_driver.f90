@@ -311,7 +311,7 @@ subroutine dlf_get_gradient(nvar,coords,energy,gradient,iimage,kiter,status,ierr
   use quick_method_module,only: quick_method
   use quick_exception_module, only: RaiseException 
 #ifdef MPIV
-  use quick_mpi_module, only: master, bMPI, quick_mpi_error
+  use quick_mpi_module, only: master, bMPI, quick_comm, quick_mpi_error
   use mpi
 #endif
   !use vib_pot
@@ -343,7 +343,7 @@ subroutine dlf_get_gradient(nvar,coords,energy,gradient,iimage,kiter,status,ierr
 
 #ifdef MPIV
      ! we now have new geometry, and let other nodes know the new geometry
-     if (bMPI)call MPI_BCAST(xyz,natom*3,mpi_double_precision,0,MPI_COMM_WORLD,quick_mpi_error)
+     if (bMPI) call MPI_BCAST(xyz,natom*3,mpi_double_precision,0,quick_comm,quick_mpi_error)
 #endif
 
 #if defined(GPU) || defined(MPIV_GPU)

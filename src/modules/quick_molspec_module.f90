@@ -316,9 +316,11 @@ contains
       use mpi
 
       implicit none
+
       type (quick_molspec_type), intent(inout) :: self
-      integer natom2
       integer, intent(inout) :: ierr
+
+      integer natom2
 
       call MPI_BCAST(self%natom,1,mpi_integer,0,quick_comm,quick_mpi_error)
 

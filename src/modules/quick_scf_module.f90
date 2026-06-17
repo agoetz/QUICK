@@ -172,11 +172,10 @@ contains
 #ifdef CEW 
      use quick_cew_module, only : quick_cew
 #endif
-#if defined(MPIV)
-     use quick_mpi_module, only: bMPI, master, quick_comm, quick_mpi_error
-     use mpi
-#else
      use quick_mpi_module, only: master
+#if defined(MPIV)
+     use quick_mpi_module, only: bMPI, quick_comm, quick_mpi_error
+     use mpi
 #endif
      use quick_io_module, only: chk_update
 

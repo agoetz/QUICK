@@ -6,9 +6,10 @@
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 !
     subroutine initialize_quick_mpi()
-    use quick_mpi_module, only: bMPI, libMPImode, master, mpi_world_rank, mpi_world_size, \
-        quick_mpi_error, quick_comm_rank, quick_comm_size, \
-        namelen, pname, quick_comm, quick_mpi_status
+    use allmod
+    use quick_mpi_module, only: bMPI, libMPImode, master, mpi_world_rank, mpi_world_size, &
+        quick_comm, quick_comm_rank, quick_comm_size, &
+        quick_mpi_error, namelen, pname, quick_mpi_status
     use quick_timer_module, only: mpi_setup_timer
     use mpi
 
@@ -50,7 +51,7 @@
 !
     subroutine mpi_setup_job(ierr)
     use allmod
-    use quick_mpi_module, only: quick_mpi_error, quick_comm
+    use quick_mpi_module, only: quick_comm, quick_mpi_error
     use mpi
 
     implicit none
@@ -78,13 +79,15 @@
     subroutine mpi_setup_mol1(ierr)
     use allmod
     use quick_gridpoints_module
-    use quick_mpi_module, only: bMPI, master, quick_mpi_error, quick_comm_rank, quick_comm_size, quick_comm
+    use quick_mpi_module, only: master, quick_comm, quick_comm_rank, &
+            quick_comm_size, quick_mpi_error
     use mpi
 
     implicit none
 
-    integer :: i    
     integer, intent(inout) :: ierr
+
+    integer :: i    
 
     ! mols specs
     call Broadcast(quick_molspec,ierr)
@@ -101,8 +104,8 @@
   subroutine mpi_setup_mol2(ierr)
     use allmod
     use quick_gridpoints_module
-    use mpi
     use quick_mpi_module, only: quick_mpi_error, quick_comm
+    use mpi
 
     implicit none
 
@@ -141,8 +144,8 @@
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     subroutine mpi_setup_basis
     use allmod
-    use mpi
     use quick_mpi_module, only: quick_mpi_error, quick_comm
+    use mpi
 
     implicit none
     
@@ -181,9 +184,12 @@
 !    call MPI_BCAST(quick_basis%gcexpomin,nshell,mpi_double_precision,0,quick_comm,quick_mpi_error)
 
     !Madu: 05/01/2019
-    call MPI_BCAST(quick_basis%gccoeff,size(quick_basis%gccoeff),mpi_double_precision,0,quick_comm,quick_mpi_error)
-    call MPI_BCAST(quick_basis%gcexpo,size(quick_basis%gcexpo),mpi_double_precision,0,quick_comm,quick_mpi_error)
-    call MPI_BCAST(quick_molspec%chg,size(quick_molspec%chg),mpi_double_precision,0,quick_comm,quick_mpi_error)
+    call MPI_BCAST(quick_basis%gccoeff,size(quick_basis%gccoeff),mpi_double_precision, &
+            0,quick_comm,quick_mpi_error)
+    call MPI_BCAST(quick_basis%gcexpo,size(quick_basis%gcexpo),mpi_double_precision, &
+            0,quick_comm,quick_mpi_error)
+    call MPI_BCAST(quick_molspec%chg,size(quick_molspec%chg),mpi_double_precision, &
+            0,quick_comm,quick_mpi_error)
     call MPI_BCAST(quick_method%iopt,1,mpi_integer,0,quick_comm,quick_mpi_error)
 
     call MPI_BCAST(quick_basis%KLMN,3*nbasis,mpi_integer,0,quick_comm,quick_mpi_error)
@@ -291,10 +297,10 @@
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     subroutine MPI_setup_hfoperator()
     use allmod
-    use quick_mpi_module, only: bMPI, master, quick_mpi_error, quick_comm_size, quick_comm
 #if defined(CEW)
     use quick_mpi_module, only: mpi_distribute_atoms
 #endif
+    use quick_mpi_module, only: bMPI, master, quick_mpi_error, quick_comm_size, quick_comm
     use mpi
 
     implicit none
@@ -356,7 +362,8 @@
 ! Madu Manathunga 07/22/2020
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     subroutine mgpu_setup()
-      use quick_mpi_module, only: allocate_mgpu, master, mgpu_id, mgpu_ids, quick_comm_rank, quick_comm_size, quick_comm, quick_mpi_status
+      use quick_mpi_module, only: allocate_mgpu, master, mgpu_id, mgpu_ids, &
+              quick_comm_rank, quick_comm_size, quick_comm, quick_mpi_status
       use mpi
 
       implicit none
@@ -398,8 +405,8 @@
  subroutine setup_xc_mpi_1
    use allmod
    use quick_gridpoints_module
-   use mpi
    use quick_mpi_module, only: quick_mpi_error, quick_comm
+   use mpi
 
    implicit none
 
@@ -419,8 +426,8 @@
 !-----------------------------------------------------------------------------
    use allmod
    use quick_gridpoints_module
-   use mpi
    use quick_mpi_module, only: bMPI, master, quick_mpi_error, quick_comm_size, quick_comm
+   use mpi
 
    implicit none
 
@@ -458,28 +465,45 @@
 #endif
 
    if(bMPI) then
-      call MPI_BCAST(quick_basis%gccoeff,size(quick_basis%gccoeff),mpi_double_precision,0,quick_comm,quick_mpi_error)
-      call MPI_BCAST(quick_basis%gcexpo,size(quick_basis%gcexpo),mpi_double_precision,0,quick_comm,quick_mpi_error)
-      call MPI_BCAST(quick_molspec%chg,size(quick_molspec%chg),mpi_double_precision,0,quick_comm,quick_mpi_error)
+      call MPI_BCAST(quick_basis%gccoeff,size(quick_basis%gccoeff),mpi_double_precision, &
+              0,quick_comm,quick_mpi_error)
+      call MPI_BCAST(quick_basis%gcexpo,size(quick_basis%gcexpo),mpi_double_precision, &
+              0,quick_comm,quick_mpi_error)
+      call MPI_BCAST(quick_molspec%chg,size(quick_molspec%chg),mpi_double_precision, &
+              0,quick_comm,quick_mpi_error)
 
 #if defined(MPIV_GPU)
-      call MPI_BCAST(quick_dft_grid%bin_locator,quick_dft_grid%gridb_count,mpi_integer,0,quick_comm,quick_mpi_error)
+      call MPI_BCAST(quick_dft_grid%bin_locator,quick_dft_grid%gridb_count,mpi_integer, &
+              0,quick_comm,quick_mpi_error)
 #else
-      call MPI_BCAST(quick_dft_grid%igridptll,quick_comm_size,mpi_integer,0,quick_comm,quick_mpi_error)
-      call MPI_BCAST(quick_dft_grid%igridptul,quick_comm_size,mpi_integer,0,quick_comm,quick_mpi_error)
+      call MPI_BCAST(quick_dft_grid%igridptll,quick_comm_size,mpi_integer, &
+              0,quick_comm,quick_mpi_error)
+      call MPI_BCAST(quick_dft_grid%igridptul,quick_comm_size,mpi_integer, &
+              0,quick_comm,quick_mpi_error)
 #endif
-      call MPI_BCAST(quick_dft_grid%bin_counter,quick_dft_grid%nbins+1,mpi_integer,0,quick_comm,quick_mpi_error)
-      call MPI_BCAST(quick_dft_grid%basf_counter,quick_dft_grid%nbins+1,mpi_integer,0,quick_comm,quick_mpi_error)
-      call MPI_BCAST(quick_dft_grid%primf_counter,quick_dft_grid%nbtotbf+1,mpi_integer,0,quick_comm,quick_mpi_error)
-      call MPI_BCAST(quick_dft_grid%basf,quick_dft_grid%nbtotbf,mpi_integer,0,quick_comm,quick_mpi_error)
+      call MPI_BCAST(quick_dft_grid%bin_counter,quick_dft_grid%nbins+1,mpi_integer, &
+              0,quick_comm,quick_mpi_error)
+      call MPI_BCAST(quick_dft_grid%basf_counter,quick_dft_grid%nbins+1,mpi_integer, &
+              0,quick_comm,quick_mpi_error)
+      call MPI_BCAST(quick_dft_grid%primf_counter,quick_dft_grid%nbtotbf+1,mpi_integer, &
+              0,quick_comm,quick_mpi_error)
+      call MPI_BCAST(quick_dft_grid%basf,quick_dft_grid%nbtotbf,mpi_integer, &
+              0,quick_comm,quick_mpi_error)
 
-      call MPI_BCAST(quick_dft_grid%primf,quick_dft_grid%nbtotpf,mpi_integer,0,quick_comm,quick_mpi_error)
-      call MPI_BCAST(quick_dft_grid%gridxb,quick_dft_grid%gridb_count,mpi_double_precision,0,quick_comm,quick_mpi_error)
-      call MPI_BCAST(quick_dft_grid%gridyb,quick_dft_grid%gridb_count,mpi_double_precision,0,quick_comm,quick_mpi_error)
-      call MPI_BCAST(quick_dft_grid%gridzb,quick_dft_grid%gridb_count,mpi_double_precision,0,quick_comm,quick_mpi_error)
-      call MPI_BCAST(quick_dft_grid%gridb_sswt,quick_dft_grid%gridb_count,mpi_double_precision,0,quick_comm,quick_mpi_error)
-      call MPI_BCAST(quick_dft_grid%gridb_weight,quick_dft_grid%gridb_count,mpi_double_precision,0,quick_comm,quick_mpi_error)
-      call MPI_BCAST(quick_dft_grid%gridb_atm,quick_dft_grid%gridb_count,mpi_integer,0,quick_comm,quick_mpi_error)
+      call MPI_BCAST(quick_dft_grid%primf,quick_dft_grid%nbtotpf,mpi_integer, &
+              0,quick_comm,quick_mpi_error)
+      call MPI_BCAST(quick_dft_grid%gridxb,quick_dft_grid%gridb_count,mpi_double_precision, &
+              0,quick_comm,quick_mpi_error)
+      call MPI_BCAST(quick_dft_grid%gridyb,quick_dft_grid%gridb_count,mpi_double_precision, &
+              0,quick_comm,quick_mpi_error)
+      call MPI_BCAST(quick_dft_grid%gridzb,quick_dft_grid%gridb_count,mpi_double_precision, &
+              0,quick_comm,quick_mpi_error)
+      call MPI_BCAST(quick_dft_grid%gridb_sswt,quick_dft_grid%gridb_count,mpi_double_precision, &
+              0,quick_comm,quick_mpi_error)
+      call MPI_BCAST(quick_dft_grid%gridb_weight,quick_dft_grid%gridb_count,mpi_double_precision, &
+              0,quick_comm,quick_mpi_error)
+      call MPI_BCAST(quick_dft_grid%gridb_atm,quick_dft_grid%gridb_count,mpi_integer, &
+              0,quick_comm,quick_mpi_error)
    endif
  end subroutine setup_xc_mpi_new_imp
 
@@ -535,13 +559,20 @@
       call MPI_BCAST(quick_dft_grid%init_ngpts, 1, mpi_integer, 0, quick_comm,quick_mpi_error)      
       call MPI_BCAST(quick_dft_grid%igridptll,quick_comm_size,mpi_integer,0,quick_comm,quick_mpi_error)
       call MPI_BCAST(quick_dft_grid%igridptul,quick_comm_size,mpi_integer,0,quick_comm,quick_mpi_error)
-      call MPI_BCAST(quick_xcg_tmp%init_grid_ptx,quick_dft_grid%init_ngpts,mpi_double_precision,0,quick_comm,quick_mpi_error)
-      call MPI_BCAST(quick_xcg_tmp%init_grid_pty,quick_dft_grid%init_ngpts,mpi_double_precision,0,quick_comm,quick_mpi_error)
-      call MPI_BCAST(quick_xcg_tmp%init_grid_ptz,quick_dft_grid%init_ngpts,mpi_double_precision,0,quick_comm,quick_mpi_error)
-      call MPI_BCAST(quick_xcg_tmp%init_grid_atm,quick_dft_grid%init_ngpts,mpi_integer,0,quick_comm,quick_mpi_error)
-      call MPI_BCAST(quick_xcg_tmp%arr_wtang,quick_dft_grid%init_ngpts,mpi_double_precision,0,quick_comm,quick_mpi_error)
-      call MPI_BCAST(quick_xcg_tmp%arr_rwt,quick_dft_grid%init_ngpts,mpi_double_precision,0,quick_comm,quick_mpi_error)
-      call MPI_BCAST(quick_xcg_tmp%arr_rad3,quick_dft_grid%init_ngpts,mpi_double_precision,0,quick_comm,quick_mpi_error)
+      call MPI_BCAST(quick_xcg_tmp%init_grid_ptx,quick_dft_grid%init_ngpts,mpi_double_precision, &
+              0,quick_comm,quick_mpi_error)
+      call MPI_BCAST(quick_xcg_tmp%init_grid_pty,quick_dft_grid%init_ngpts,mpi_double_precision, &
+              0,quick_comm,quick_mpi_error)
+      call MPI_BCAST(quick_xcg_tmp%init_grid_ptz,quick_dft_grid%init_ngpts,mpi_double_precision, &
+              0,quick_comm,quick_mpi_error)
+      call MPI_BCAST(quick_xcg_tmp%init_grid_atm,quick_dft_grid%init_ngpts,mpi_integer, &
+              0,quick_comm,quick_mpi_error)
+      call MPI_BCAST(quick_xcg_tmp%arr_wtang,quick_dft_grid%init_ngpts,mpi_double_precision, &
+              0,quick_comm,quick_mpi_error)
+      call MPI_BCAST(quick_xcg_tmp%arr_rwt,quick_dft_grid%init_ngpts,mpi_double_precision, &
+              0,quick_comm,quick_mpi_error)
+      call MPI_BCAST(quick_xcg_tmp%arr_rad3,quick_dft_grid%init_ngpts,mpi_double_precision, &
+              0,quick_comm,quick_mpi_error)
    endif 
    end subroutine setup_ssw_mpi
 
@@ -549,7 +580,8 @@
    subroutine get_mpi_ssw
    use allmod
    use quick_gridpoints_module
-   use quick_mpi_module, only: master, quick_mpi_error, quick_comm_rank, quick_comm_size, quick_comm
+   use quick_mpi_module, only: master, quick_mpi_error, quick_comm_rank, &
+           quick_comm_size, quick_comm, quick_mpi_status
    use mpi
 
    implicit none
@@ -557,8 +589,10 @@
    integer :: i, j, ierror
 
    if(.not. master) then
-      call MPI_SEND(quick_xcg_tmp%sswt,quick_dft_grid%init_ngpts,mpi_double_precision,0,quick_comm_rank,quick_comm,IERROR)
-      call MPI_SEND(quick_xcg_tmp%weight,quick_dft_grid%init_ngpts,mpi_double_precision,0,quick_comm_rank,quick_comm,IERROR)
+      call MPI_SEND(quick_xcg_tmp%sswt,quick_dft_grid%init_ngpts,mpi_double_precision, &
+              0,quick_comm_rank,quick_comm,IERROR)
+      call MPI_SEND(quick_xcg_tmp%weight,quick_dft_grid%init_ngpts,mpi_double_precision, &
+              0,quick_comm_rank,quick_comm,IERROR)
    else
 
       do i=1,quick_comm_size-1

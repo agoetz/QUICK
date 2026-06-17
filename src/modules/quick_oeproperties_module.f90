@@ -34,7 +34,7 @@ module quick_oeproperties_module
    use quick_molspec_module, only: quick_molspec
    use quick_calculated_module, only: quick_qm_struct
 #if defined(MPIV)
-   use quick_mpi_module, only: master, quick_mpi_error, quick_comm
+   use quick_mpi_module, only: master, quick_comm, quick_mpi_error
    use mpi
 #endif
    implicit none
@@ -179,14 +179,13 @@ module quick_oeproperties_module
  !     2. esp_shell_pair: Computes the electronic contribution to the ESP     !
  !----------------------------------------------------------------------------!
  subroutine compute_esp(npoints,xyz_points,esp)
+   use quick_basis_module, only: jshell
    use quick_calculated_module, only: quick_qm_struct
    use quick_timer_module, only : timer_begin, timer_end, timer_cumer
 #if defined(MPIV)
-    use quick_basis_module, only: jshell, mpi_jshelln, mpi_jshell
-    use quick_mpi_module, only: quick_comm_rank, quick_mpi_error, quick_comm
+    use quick_basis_module, only: mpi_jshelln, mpi_jshell
+    use quick_mpi_module, only: quick_comm, quick_comm_rank, quick_mpi_error
     use mpi
-#else
-   use quick_basis_module, only: jshell
 #endif
 #if defined(GPU) || defined(MPIV_GPU)
     use quick_method_module, only: quick_method
@@ -533,7 +532,7 @@ module quick_oeproperties_module
   use quick_timer_module, only: timer_begin, timer_end, timer_cumer
 #if defined(MPIV)
    use quick_basis_module, only: mpi_jshelln, mpi_jshell
-   use quick_mpi_module, only: master, quick_comm_rank, quick_mpi_error, quick_comm
+   use quick_mpi_module, only: master, quick_comm, quick_comm_rank, quick_mpi_error
    use mpi
 #endif
 

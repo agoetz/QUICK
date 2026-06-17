@@ -129,7 +129,7 @@ end subroutine finalize
 subroutine quick_exit(io, ierr)
    use allmod
 #if defined(MPIV)
-   use quick_mpi_module, only: quick_mpi_error, quick_comm
+   use quick_mpi_module, only: quick_comm, quick_mpi_error
    use mpi
 #endif
 

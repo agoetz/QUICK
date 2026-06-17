@@ -41,23 +41,23 @@
     use quick_timer_module, only : timer_end, timer_cumer, timer_begin
     use quick_method_module, only : quick_method
     use quick_files_module, only: ioutfile, outFileName, iDataFile, dataFileName
-    use quick_mpi_module, only: master, bMPI, print_quick_mpi
     use quick_molspec_module, only: quick_molspec, natom, alloc
     use quick_basis_module, only: nbasis
     use quick_files_module, only: write_molden, set_quick_files, print_quick_io_file
     use quick_molsurface_module, only: generate_MKS_surfaces
-#if defined(MPIV)
-    use mpi
-#endif
 #if defined(GPU) || defined(MPIV_GPU)
-    use quick_basis_module, only: quick_basis, aexp, cutprim, dcoeff, itype
-    use quick_basis_module, only: jbasis, jshell, maxcontract, ncontract
-    use quick_basis_module, only: nprim, nshell, Ycutoff
+    use quick_basis_module, only: quick_basis, aexp, cutprim, dcoeff, itype, &
+            jbasis, jshell, maxcontract, ncontract, nprim, nshell, Ycutoff
     use quick_molspec_module, only : xyz
     use quick_method_module, only: delete, upload
 #endif
-#if defined(MPIV_GPU)
-    use quick_mpi_module, only: mpi_world_rank, quick_comm, quick_comm_rank, quick_comm_size, mgpu_id, mgpu_ids
+    use quick_mpi_module, only: master
+#if defined(MPIV)
+    use quick_mpi_module, only: bMPI, print_quick_mpi
+#  if defined(MPIV_GPU)
+    use quick_mpi_module, only: mpi_world_rank, quick_comm, quick_comm_rank, &
+            quick_comm_size, mgpu_id, mgpu_ids
+#  endif
 #endif
 
     implicit none

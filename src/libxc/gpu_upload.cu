@@ -3,14 +3,12 @@
   #define gpuSuccess hipSuccess
   #define gpuMemcpyKind hipMemcpyKind
   #define gpuMemcpyHostToDevice hipMemcpyHostToDevice
-  #define gpuMemcpyDeviceToHost hipMemcpyDeviceToHost
   #define gpuGetErrorString_ hipGetErrorString
 #elif defined(CUDA) || defined(CUDA_MPIV)
   #define gpuError_t cudaError_t
   #define gpuSuccess cudaSuccess
   #define gpuMemcpyKind cudaMemcpyKind
   #define gpuMemcpyHostToDevice cudaMemcpyHostToDevice
-  #define gpuMemcpyDeviceToHost cudaMemcpyDeviceToHost
   #define gpuGetErrorString_ cudaGetErrorString
 #endif
 

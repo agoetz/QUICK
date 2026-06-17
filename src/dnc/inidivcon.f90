@@ -35,11 +35,10 @@
 
 subroutine inidivcon(natomsaved)
   use allmod
-#if defined(MPIV)
-  use quick_mpi_module, only: bMPI, master, quick_mpi_error, quick_comm_size, quick_comm
-  use mpi
-#else
   use quick_mpi_module, only: master
+#if defined(MPIV)
+  use quick_mpi_module, only: bMPI, quick_comm, quick_comm_size, quick_mpi_error
+  use mpi
 #endif
 
   implicit double precision (a-h,o-z)

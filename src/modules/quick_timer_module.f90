@@ -126,13 +126,11 @@ module quick_timer_module
     ! Output time infos
     !-----------------------
     subroutine timer_output(io)
-        use quick_mpi_module
         use quick_method_module
-#if defined(MPIV)
-        use quick_mpi_module, only: master, quick_comm
-        use mpi
-#else
         use quick_mpi_module, only: master
+#if defined(MPIV)
+        use quick_mpi_module, only: quick_comm, quick_comm_size, quick_mpi_error
+        use mpi
 #endif
         implicit none
         integer i,IERROR,io
