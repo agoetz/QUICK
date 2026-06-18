@@ -255,7 +255,7 @@ subroutine MPI_calmp2
   use quick_basis_module, only: mpi_jshell, mpi_jshelln
   use quick_gaussian_class_module
   use quick_cutoff_module, only: cshell_density_cutoff
-  use quick_mpi_module, only: bMPI, master, quick_comm, quick_comm_rank, \
+  use quick_mpi_module, only: bMPI, master, quick_comm, quick_comm_rank, &
         quick_comm_size, quick_mpi_error, quick_mpi_status
   use mpi
 
