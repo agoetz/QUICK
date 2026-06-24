@@ -254,17 +254,23 @@ extern "C" void gpu_new_(
     gpu->DFT_calculated = NULL;
     gpu->grad = NULL;
     gpu->ptchg_grad = NULL;
+#if defined(USE_LEGACY_ATOMICS)
     gpu->gradULL = NULL;
     gpu->ptchg_gradULL = NULL;
+#endif
+#if defined(CEW)
     gpu->cew_grad = NULL;
+    gpu->lri_data = NULL;
+#endif
     gpu->gpu_calculated = NULL;
     gpu->gpu_basis = NULL;
     gpu->gpu_cutoff = NULL;
     gpu->gpu_xcq = NULL;
+#if defined(COMPILE_GPU_AOINT)
     gpu->aoint_buffer = NULL;
     gpu->intCount = NULL;
+#endif
     gpu->scratch = NULL;
-    gpu->lri_data = NULL;
 
 #if defined(MPIV_GPU)
     gpu->timer = new gpu_timer_type;
@@ -644,7 +650,9 @@ extern "C" void gpu_setup_(int* natom, int* nbasis, int* nElec, int* imult, int*
     gpu->gpu_sim.imult = *imult;
     gpu->gpu_sim.molchg = *molchg;
     gpu->gpu_sim.iAtomType = *iAtomType;
+#if defined(CEW)
     gpu->gpu_sim.use_cew = false;
+#endif
 
     gpu->gpu_xcq = new XC_quadrature_type;
     gpu->gpu_xcq->npoints = 0;
@@ -2171,6 +2179,7 @@ extern "C" void gpu_upload_grad_(QUICKDouble* gradCutoff)
 }
 
 
+#if defined(CEW)
 //-----------------------------------------------
 //  upload information for LRI calculation
 //-----------------------------------------------
@@ -2198,7 +2207,6 @@ extern "C" void gpu_upload_lri_(QUICKDouble* zeta, QUICKDouble* cc, int *ierr)
 }
 
 
-#if defined(CEW)
 //-----------------------------------------------
 //  upload information for CEW quad calculation
 //-----------------------------------------------
@@ -2241,11 +2249,11 @@ extern "C" void gpu_get_ssw_(QUICKDouble *gridx, QUICKDouble *gridy, QUICKDouble
     gpu->gpu_xcq->gridy = new gpu_buffer_type<QUICKDouble>(gridy, gpu->gpu_xcq->npoints);
     gpu->gpu_xcq->gridz = new gpu_buffer_type<QUICKDouble>(gridz, gpu->gpu_xcq->npoints);
     gpu->gpu_xcq->wtang = new gpu_buffer_type<QUICKDouble>(wtang, gpu->gpu_xcq->npoints);
-    gpu->gpu_xcq->rwt   = new gpu_buffer_type<QUICKDouble>(rwt, gpu->gpu_xcq->npoints);
-    gpu->gpu_xcq->rad3  = new gpu_buffer_type<QUICKDouble>(rad3, gpu->gpu_xcq->npoints);
-    gpu->gpu_xcq->gatm  = new gpu_buffer_type<int>(gatm, gpu->gpu_xcq->npoints);
-    gpu->gpu_xcq->sswt  = new gpu_buffer_type<QUICKDouble>(gpu->gpu_xcq->npoints);
-    gpu->gpu_xcq->weight= new gpu_buffer_type<QUICKDouble>(gpu->gpu_xcq->npoints);
+    gpu->gpu_xcq->rwt = new gpu_buffer_type<QUICKDouble>(rwt, gpu->gpu_xcq->npoints);
+    gpu->gpu_xcq->rad3 = new gpu_buffer_type<QUICKDouble>(rad3, gpu->gpu_xcq->npoints);
+    gpu->gpu_xcq->gatm = new gpu_buffer_type<int>(gatm, gpu->gpu_xcq->npoints);
+    gpu->gpu_xcq->sswt = new gpu_buffer_type<QUICKDouble>(gpu->gpu_xcq->npoints);
+    gpu->gpu_xcq->weight = new gpu_buffer_type<QUICKDouble>(gpu->gpu_xcq->npoints);
 
     gpu->gpu_xcq->gridx->Upload();
     gpu->gpu_xcq->gridy->Upload();
@@ -3436,6 +3444,7 @@ extern "C" void gpu_delete_libxc_(int *ierr)
 }
 
 
+#if defined(CEW)
 //-------------------------------------------------
 //  delete information uploaded for LRI calculation
 //-------------------------------------------------
@@ -3452,3 +3461,4 @@ extern "C" void gpu_delete_cew_vrecip_(int *ierr)
 {
     SAFE_DELETE(gpu->lri_data->vrecip);
 }
+#endif

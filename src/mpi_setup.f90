@@ -129,7 +129,7 @@
     subroutine mpi_bcast_grid_vars
       use quick_gridpoints_module, only: RGRID, RWT 
       use quick_size_module, only: MAXRADGRID
-      use quick_mpi_module, only: quick_mpi_error, quick_comm
+      use quick_mpi_module, only: quick_comm, quick_mpi_error
       use mpi
 
       implicit none

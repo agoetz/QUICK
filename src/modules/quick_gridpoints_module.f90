@@ -151,12 +151,14 @@ module quick_gridpoints_module
     use quick_mpi_module, only: bMPI, master, quick_comm, quick_comm_rank
 #endif
 
-    implicit double precision(a-h,o-z)
+    implicit none
 
     type(quick_xc_grid_type), intent(inout) :: self
     type(quick_xcg_tmp_type), intent(inout) :: xcg_tmp
 
-    double precision :: t_octree, t_prscrn
+    integer :: Iang, Iatm, idx, idx_grid, iiangt, Irad, Iradtemp, ist, iend
+    double precision :: t_octree, t_prscrn, rad, rad3
+    double precision, external :: SSW
 
     !Form the quadrature and store coordinates and other information
     !Measure the time to form grid
@@ -185,7 +187,7 @@ module quick_gridpoints_module
     !if(quick_method%iSG.eq.1) call gridformSG1()
 
     idx_grid = 0
-    do Iatm=1,natom
+    do Iatm = 1, natom
         if(quick_method%iSG.eq.1)then
             Iradtemp=50
         else
@@ -203,13 +205,13 @@ module quick_gridpoints_module
                 call gridformSG0(iatm,Iradtemp+1-Irad,iiangt,RGRID,RWT)
                 rad = radii2(quick_molspec%iattype(iatm))
             endif
-            rad3 = rad*rad*rad
-            do Iang=1,iiangt
-                idx_grid=idx_grid+1
-                xcg_tmp%init_grid_ptx(idx_grid)=xyz(1,Iatm)+rad*RGRID(Irad)*XANG(Iang)
-                xcg_tmp%init_grid_pty(idx_grid)=xyz(2,Iatm)+rad*RGRID(Irad)*YANG(Iang)
-                xcg_tmp%init_grid_ptz(idx_grid)=xyz(3,Iatm)+rad*RGRID(Irad)*ZANG(Iang)
-                xcg_tmp%init_grid_atm(idx_grid)=Iatm
+            rad3 = rad * rad * rad
+            do Iang = 1, iiangt
+                idx_grid = idx_grid+1
+                xcg_tmp%init_grid_ptx(idx_grid) = xyz(1,Iatm) + rad * RGRID(Irad) * XANG(Iang)
+                xcg_tmp%init_grid_pty(idx_grid) = xyz(2,Iatm) + rad * RGRID(Irad) * YANG(Iang)
+                xcg_tmp%init_grid_ptz(idx_grid) = xyz(3,Iatm) + rad * RGRID(Irad) * ZANG(Iang)
+                xcg_tmp%init_grid_atm(idx_grid) = Iatm
                 xcg_tmp%arr_wtang(idx_grid) = WTANG(Iang)
                 xcg_tmp%arr_rwt(idx_grid) = RWT(Irad)
                 xcg_tmp%arr_rad3(idx_grid) = rad3
@@ -256,13 +258,14 @@ module quick_gridpoints_module
       iend = idx_grid
    endif
 
-   do idx=ist, iend
+   do idx = ist, iend
 #else
-   do idx=1, idx_grid
+   do idx = 1, idx_grid
 #endif
-        xcg_tmp%sswt(idx)=SSW(xcg_tmp%init_grid_ptx(idx), xcg_tmp%init_grid_pty(idx), xcg_tmp%init_grid_ptz(idx), &
-        xcg_tmp%init_grid_atm(idx))
-        xcg_tmp%weight(idx)=xcg_tmp%sswt(idx)*xcg_tmp%arr_wtang(idx)*xcg_tmp%arr_rwt(idx)*xcg_tmp%arr_rad3(idx)
+        xcg_tmp%sswt(idx) = SSW(xcg_tmp%init_grid_ptx(idx), xcg_tmp%init_grid_pty(idx), &
+                xcg_tmp%init_grid_ptz(idx), xcg_tmp%init_grid_atm(idx))
+        xcg_tmp%weight(idx) = xcg_tmp%sswt(idx) * xcg_tmp%arr_wtang(idx) * xcg_tmp%arr_rwt(idx) &
+                * xcg_tmp%arr_rad3(idx)
     enddo
 
 #if defined(MPIV) && !defined(MPIV_GPU)
@@ -516,7 +519,7 @@ module quick_gridpoints_module
 
         implicit none
 
-        type(quick_xc_grid_type) self
+        type(quick_xc_grid_type), intent(inout) :: self
 
         if (.not. allocated(self%igridptul)) allocate(self%igridptul(quick_comm_size))
         if (.not. allocated(self%igridptll)) allocate(self%igridptll(quick_comm_size))
