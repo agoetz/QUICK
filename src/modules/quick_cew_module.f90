@@ -125,7 +125,8 @@ contains
     use quick_basis_module
     use quick_method_module, only: quick_method
 #if defined(MPIV)
-    use quick_mpi_module, only: quick_comm, quick_comm_rank, quick_mpi_error
+    use quick_mpi_module, only: quick_comm, quick_comm_rank, quick_mpi_error, &
+            natomll, natomul, nextatomll, nextatomul
     use mpi
 #endif    
 
@@ -572,7 +573,7 @@ contains
     use quick_gridpoints_module, only : quick_dft_grid
     use quick_method_module, only: quick_method
 #if defined(MPIV)
-   use quick_mpi_module, only: quick_comm_rank
+   use quick_mpi_module, only: quick_comm_rank, natomll, natomul, nextatomll, nextatomul
 #endif
 
     implicit none
