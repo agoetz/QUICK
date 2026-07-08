@@ -11,7 +11,7 @@ subroutine electdiisdc(jscf,PRMS)
    use allmod
    use quick_mpi_module, only: bMPI, master
 #if defined(MPIV)
-   use quick_mpi_module, only: quick_comm, quick_comm_rank, mpirsize, quick_mpi_error
+   use quick_mpi_module, only: quick_comm, quick_comm_rank, quick_comm_size, quick_mpi_error
    use mpi
 #endif
 

@@ -12,8 +12,8 @@
 module quick_mpi_module
 
 !------------------------------------------------------------------------
-!  ATTRIBUTES  : quick_mpi_error,quick_comm_rank,namelen,mpisiz,pname
-!                master,bMPI
+!  ATTRIBUTES  : quick_mpi_error, quick_comm_rank, quick_comm_size,
+!                namelen, pname, master, bMPI
 !  SUBROUTINES : check_quick_mpi
 !                print_quick_mpi
 !  FUNCTIONS   : none
