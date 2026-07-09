@@ -71,7 +71,6 @@ contains
  ! Recurrence Relations. J. Chem. Phys. 1988, 89, 5777–5786.
  !__________________________________________________________________
 subroutine get_eri_precomputables
-   use allmod
    use quick_basis_module
    use quick_molspec_module, only: xyz
    use quick_mpi_module, only: master

@@ -83,7 +83,6 @@ contains
 #else
   subroutine cshell_gradient(ierr)
 #endif
-     use allmod
      use quick_calculated_module, only: quick_qm_struct
      use quick_files_module, only: ioutfile
      use quick_method_module, only: quick_method
