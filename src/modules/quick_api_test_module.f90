@@ -100,23 +100,20 @@ contains
   end subroutine load_test_data
 
 #ifdef MPIV
-  ! initialize mpi library and save quick_comm_rank and quick_comm_size
-  subroutine mpi_initialize(mpicomm, quick_comm_size, quick_comm_rank, master, quick_mpi_error)
-    use quick_mpi_module, only: quick_comm
+  ! initialize MPI library and save MPI rank and MPI comm size
+  subroutine mpi_initialize(mpisize, mpirank, master, mpierror)
     use mpi
 
     implicit none
 
-    integer, intent(in) :: mpicomm
-    integer, intent(inout) :: quick_comm_size, quick_comm_rank, quick_mpi_error
+    integer, intent(inout) :: mpisize, mpirank, mpierror
     logical, intent(inout) :: master
 
-    call MPI_INIT(quick_mpi_error)
-    call MPI_Comm_dup(mpicomm, quick_comm, quick_mpi_error)
-    call MPI_COMM_RANK(quick_comm, quick_comm_rank, quick_mpi_error)
-    call MPI_COMM_SIZE(quick_comm, quick_comm_size, quick_mpi_error)
+    call MPI_INIT(mpierror)
+    call MPI_COMM_RANK(MPI_COMM_WORLD, mpirank, mpierror)
+    call MPI_COMM_SIZE(MPI_COMM_WORLD, mpisize, mpierror)
 
-    if(quick_comm_rank .eq. 0) then
+    if(mpirank .eq. 0) then
       master = .true.
     else
       master = .false.
@@ -148,9 +145,9 @@ contains
 
     implicit none
 
-    integer :: quick_mpi_error
+    integer :: mpierror
 
-    call MPI_FINALIZE(quick_mpi_error)
+    call MPI_FINALIZE(mpierror)
     call exit(0)
   end subroutine mpi_exit
 

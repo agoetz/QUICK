@@ -18,9 +18,7 @@
 #if defined(MPIV)
     use test_quick_api_module, only: mpi_initialize, printQuickMPIOutput, mpi_exit
     use quick_api_module, only: setQuickMPI
-    use quick_mpi_module, only: quick_comm
     use mpi
-    ! use qmmm_module, only: qmmm_nml, qmmm_mpi
 #endif
 
     implicit none
@@ -54,9 +52,9 @@
 
 #ifdef MPIV
     ! essential mpi information 
-    integer :: quick_mpi_error = 0
-    integer :: quick_comm_rank  = 0
-    integer :: quick_comm_size  = 1
+    integer :: mpierror = 0
+    integer :: mpirank  = 0
+    integer :: mpisize  = 1
     logical :: master   = .true.
 #endif
 
@@ -64,7 +62,7 @@
 
 #ifdef MPIV
     ! initialize mpi library and get quick_comm_rank, quick_comm_size
-    call mpi_initialize(MPI_COMM_WORLD, quick_comm_size, quick_comm_rank, master, quick_mpi_error)
+    call mpi_initialize(mpisize, mpirank, master, mpierror)
 
     ! setup quick mpi using api, called only once
     call setQuickMPI(MPI_COMM_WORLD, ierr)
@@ -132,13 +130,13 @@
       ! print values obtained from quick library
 #ifdef MPIV
       ! dumb way to sequantially print from all cores..
-      call MPI_BARRIER(quick_comm, quick_mpi_error)
+      call MPI_BARRIER(MPI_COMM_WORLD, mpierror)
 
-      do j=0, quick_comm_size-1
-        if(j .eq. quick_comm_rank) then
-          call printQuickMPIOutput(natoms, nxt_charges, atomic_numbers, totEne, gradients, ptchgGrad, quick_comm_rank)
+      do j=0, mpisize-1
+        if(j .eq. mpirank) then
+          call printQuickMPIOutput(natoms, nxt_charges, atomic_numbers, totEne, gradients, ptchgGrad, mpirank)
         endif
-        call MPI_BARRIER(quick_comm, quick_mpi_error)
+        call MPI_BARRIER(MPI_COMM_WORLD, mpierror)
       enddo 
 #else
       call printQuickOutput(natoms, nxt_charges, atomic_numbers, totEne, gradients, ptchgGrad)

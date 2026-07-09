@@ -16,7 +16,6 @@
 #if defined(MPIV) || defined(MPIV_GPU)
     use test_quick_api_module, only : mpi_initialize, printQuickMPIOutput
     use quick_api_module, only : setQuickMPI
-    use quick_mpi_module, only: quick_comm
     use mpi
 #endif
 
@@ -61,7 +60,7 @@
     call mpi_initialize(MPI_COMM_WORLD, mpisize, mpirank, master, mpierror)
 
     ! setup quick mpi using api, called only once
-    call setQuickMPI(mpirank, mpisize)
+    call setQuickMPI(MPI_COMM_WORLD, ierr)
 #endif
 
     ! set molecule size. We consider a water molecule surounded by 3 point
@@ -113,13 +112,13 @@
       ! print values obtained from quick library
 #if defined(MPIV) || defined(MPIV_GPU)
       ! dumb way to sequantially print from all cores..
-      call MPI_BARRIER(quick_comm, mpierror)
+      call MPI_BARRIER(MPI_COMM_WORLD, mpierror)
 
       do j=0, mpisize-1
         if(j .eq. mpirank) then
           call printQuickMPIOutput(natoms, nxt_charges, atomic_numbers, totEne, gradients, ptchgGrad, mpirank)
         endif
-        call MPI_BARRIER(quick_comm, mpierror)
+        call MPI_BARRIER(MPI_COMM_WORLD, mpierror)
       enddo 
 #else
       call printQuickOutput(natoms, nxt_charges, atomic_numbers, totEne, gradients, ptchgGrad)
