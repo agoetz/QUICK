@@ -58,7 +58,6 @@ end subroutine deallocate_quick_cutoff
 
 
 subroutine schwarzoff
-  use allmod
   use quick_basis_module, only: nshell, jbasis, YCutoff, cutprim
   use quick_mpi_module, only: master
 #if defined(MPIV)
